@@ -1,0 +1,54 @@
+\documentclass[../main.tex]{subfiles}
+
+\newcommand{\Zero}{\mathbf{0}}
+\newcommand{\AAA}{\mathbf{A}}
+\newcommand{\BBB}{\mathbf{B}}
+\newcommand{\CCC}{\mathbf{C}}
+
+\begin{document}
+  \chapter{Wstęp}
+
+  \section{Sformułowanie problemu}
+    Niech \( \AAA \in M_{n \times n}(\RR) \) będzie macierzą blokową
+    o~strukturze~(\ref{eq:matrix-A-def}),
+    \begin{equation} \label{eq:matrix-A-def}
+      \AAA = \begin{bmatrix}
+        \AAA_1 & \CCC_1 & \Zero  & \Zero      & \Zero       & \hdots      & \Zero       \\
+        \BBB_2 & \AAA_2 & \CCC_2 & \Zero      & \Zero       & \hdots      & \Zero       \\
+        \Zero  & \BBB_3 & \AAA_3 & \CCC_3     & \Zero       & \hdots      & \Zero       \\
+        \vdots & \ddots & \ddots & \ddots     & \ddots      & \ddots      & \vdots      \\
+        \Zero  & \hdots & \Zero  & \BBB_{v-2} & \AAA_{v-2}  & \CCC_{v-2}  & \Zero       \\
+        \Zero  & \hdots & \Zero  & \Zero      & \BBB_{v-1}  & \AAA_{v-1}  & \CCC_{v-1}  \\
+        \Zero  & \hdots & \Zero  & \Zero      & \Zero       & \BBB_v      & \AAA_v
+      \end{bmatrix}
+    \end{equation}
+    przy czym \( v = n / \ell \) (zakładamy, że~\( \ell | n \)).
+    Macierz \( \AAA_k \in M_{\ell \times \ell}(\RR) \) jest macierzą gęstą,
+    macierz \( \BBB_k \in M_{\ell \times \ell}(\RR) \) jest macierzą rzadką
+    postaci~(\ref{eq:matrix-Bk-def})
+    \begin{equation} \label{eq:matrix-Bk-def}
+      \BBB_k = \begin{bmatrix}
+        0       & \hdots & 0      & b^k_1     \\
+        0       & \hdots & 0      & b^k_2     \\
+        \vdots  & \ddots & \vdots & \vdots    \\
+        0       & \hdots & 0      & b^k_\ell  \\
+      \end{bmatrix}
+    \end{equation}
+    oraz macierz \( \CCC_k \in M_{\ell \times \ell}(\RR) \) jest macierzą rzadką
+    postaci~(\ref{eq:matrix-Ck-def}).
+    \begin{equation} \label{eq:matrix-Ck-def}
+      \CCC_k = \begin{bmatrix}
+        c^k_1   & 0       & 0       & \hdots        & 0         \\
+        0       & c^k_2   & 0       & \hdots        & 0         \\
+        \vdots  & \ddots  & \ddots  & \ddots        & \hdots    \\
+        0       & \hdots  & 0       & c^k_{\ell-1}  & 0         \\
+        0       & \hdots  & 0       & 0             & c^k_\ell  \\
+      \end{bmatrix}
+    \end{equation}
+    
+    \begin{problem}
+      Należy rozwiązać układ równań \( \AAA \mathbf{x} = \mathbf{b} \)
+      za~pomocą zaadaptowanego algorytmu eliminacji Gaussa
+      oraz rozkładu~LU.
+    \end{problem}
+\end{document}

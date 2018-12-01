@@ -30,3 +30,5 @@
 *.loa
 *.lot
 *.lof
+*.bcf
+*.run.xml
