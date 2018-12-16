@@ -7,7 +7,10 @@
 
 \begin{document}
   \chapter{Wstęp}
-
+  W poniższym rozdziale będzie opisana natura problemu potrzebna do rozwiązania
+  oraz wszelkie obserwacje, które będą prowadzić do rozwiązania problemu.
+  
+  Zacznijmy najpierw od formułowania problemu.
   \section{Sformułowanie problemu}
     Niech \( \AAA \in M_{n \times n}(\RR) \) będzie macierzą blokową
     o~strukturze~(\ref{eq:matrix-A-def}),
@@ -51,4 +54,212 @@
       za~pomocą zaadaptowanego algorytmu eliminacji Gaussa
       oraz rozkładu~LU.
     \end{problem}
+    \begin{remark}
+      Będziemy oznaczać przez \( [A]_{ij} \) jako wartość elementu macierzy \( A \)
+      w \( i \)-tym wierszu i \( j \)-tej kolumnie.
+    \end{remark}
+
+    \section{Opis algorytmów}
+    
+    By mieć odniesienie co do tego, w jaki sposób algorytm eliminacji Gaussa
+    upraszcza się przy podanej postaci macierzy, musimy zdefiniować, czym jest
+    algorytm eliminacji Gaussa. Algorytm jest opisany dokładnie w~\cite{kielb92}.
+
+    \subsection{Algorytm eliminacji Gaussa}
+    Załóżmy, że macierz \( A \in M_{n \times n}(\RR) \) jest macierzą nieosobliwą,
+    \( b \in \RR^n \) jest wektorem wyrazów wolnych. Naszym zadaniem
+    jest obliczenie układu równań \( Ax = b \).
+
+    W algorytmie eliminacji Gaussa wyróżniamy podstawowy element algorytmu,
+    który nazywamy \emph{krokiem eliminacji}.
+
+    W \( k \)-tym kroku eliminacyjnym oblicza się mnożniki eliminacyjne
+    \[ l_{ik} = [A^{(k)}]_{ik}/[A^{(k)}]_{kk} \] gdzie \( A^{(k)} \)
+    jest macierzą, która jest w \( k \)-tym kroku eliminacyjnym,
+    oraz \( k + 1 \le i \le n \).
+    Następnie, po obliczeniu mnożnika, przekształcamy macierz,
+    otrzymując tym samym macierz \( A^{(k + 1)} \), zgodnie
+    ze wzorem~\ref{eq:elimination-step-A}.
+    \begin{equation} \label{eq:elimination-step-A}
+      [A^{(k + 1)}]_{ij} := \begin{cases}
+        0 & \text{dla $k + 1 \le i \le n$ oraz $j = k$} \\
+        [A^{(k)}]_{ij} - l_{ik} \cdot [A^{(k)}]_{kj} & \text{dla $k + 1 \le i \le n$ oraz $k + 1 \le
+        j \le n$} \\
+        [A^{(k)}]_{ij} & \text{dla pozostałych wskaźników}
+      \end{cases}
+    \end{equation}
+    Tym samym przekształca się wektor prawych stron za pomocą wzoru~\ref{eq:elimination-step-b}.
+    \begin{equation} \label{eq:elimination-step-b}
+      b^{(k + 1)}_i := \begin{cases}
+        b^{(k}_i - l_{ik} \cdot b^{(k)}_k & \text{dla $k + 1 \le i \le n$} \\
+        b^{(k)}_i & \text{dla pozostałych wskaźników}
+      \end{cases}
+    \end{equation}
+
+    Celem \( k \)-tego kroku eliminacyjnego jest wyrugowanie \( n - k \) ostatnich elementów
+    \( k \)-tej kolumny. Powtarzając kroki eliminacyjne dla \( 1 \le k \le n-1 \) 
+    sprawimy, że otrzymamy macierz rzadką, trójkątną górną.
+    Ten proces prowadzi nas do postaci macierzy, którą potem, przy odpowiedniej
+    technice, da nam wektor \( x \) w czasie \( O(n^2) \).
+
+    Koszt algorytmu eliminacji Gaussa wynosi, dla macierzy gęstych, co najwyżej \( O(n^3) \)
+    operacji.
+
+    \begin{example} \label{ex:gauss-elim}
+      Załóżmy, że mamy zadaną macierz nieosobliwą~\ref{eq:example-gauss:A-mat}
+      oraz wektor prawych stron~\ref{eq:example-gauss:b-vec}.
+      \begin{align}
+        A &= \begin{bmatrix} \label{eq:example-gauss:A-mat} 
+          3 & 4 & 2 \\
+          1 & 8 & 7 \\
+          2 & 2 & 3
+        \end{bmatrix} \\
+        b &= \begin{bmatrix} \label{eq:example-gauss:b-vec}
+          4 \\
+          2 \\
+          0
+        \end{bmatrix}
+      \end{align}
+      Zostanie rozwiązany układ równań \( Ax = b \) za pomocą algorytmu eliminacji
+      Gaussa. Skonstruujmy macierz rozszerzoną \( [A | b] \) i następnie dokonujmy
+      kolejnych kroków eliminacji.
+
+      Dla pierwszego kroku eliminacyjnego \( k = 1 \) obliczamy mnożniki.
+      Są to kolejno \( l_{21} = 1 / 3 \) oraz \( l_{31} = 2 / 3 \).
+      Do drugiego i trzeciego wiersza dodajemy pierwszy wiersz pomnożony
+      przez odpowiednie mnożniki eliminacyjne. Otrzymujemy wtedy
+      \begin{equation*}
+        \left[ \begin{array}{ccc|c}
+          3 & 4             & 2             & 4             \\
+          0 & 6\frac{2}{3}  & 6\frac{1}{3}  & \frac{2}{3}   \\
+          0 & -\frac{2}{3}  & 1\frac{2}{3}  & -\frac{2}{3}
+        \end{array}\right]
+      \end{equation*}
+
+      Dla drugiego kroku zaś mamy, że \( l_{32} = \frac{-\frac{2}{3}}{6\frac{2}{3}} 
+      = \frac{-\frac{2}{3}}{\frac{20}{3}} = -\frac{1}{10} \). Przekształcając
+      trzeci wiersz odpowiednio, otrzymujemy
+      \begin{equation*}
+        \left[ \begin{array}{ccc|c}
+          3 & 4             & 2             & 4             \\
+          0 & 6\frac{2}{3}  & 6\frac{1}{3}  & \frac{2}{3}   \\
+          0 & 0             & 2\frac{3}{10} & -\frac{3}{5}
+        \end{array}\right]
+      \end{equation*}
+      
+      Uzyskaliśmy właśnie macierz trójkątną górną. Teraz rozwiązujemy
+      układ z macierzą trójkątną górną, zaczynając od ostatniego wiersza do
+      pierwszego. Ostatni wiersz dzielimy przez element na przekątnej,
+      następnie odejmujemy wielokrotność ostatniego wiersza od pozostałych
+      wierszy tak, aby wyeliminować elementy nad przekątną.
+      \begin{equation*}
+        \left[ \begin{array}{ccc|c}
+          3 & 4             & 0             & \frac{104}{23}   \\
+          0 & 6\frac{2}{3}  & 0             & \frac{160}{69}   \\
+          0 & 0             & 1             & -\frac{6}{23}
+        \end{array}\right]
+      \end{equation*}
+      Podobnie robimy z drugim wierszem. 
+      \begin{equation*}
+        \left[ \begin{array}{ccc|c}
+          3 & 0             & 0             & -\frac{536}{23}  \\
+          0 & 1             & 0             & \frac{160}{23}   \\
+          0 & 0             & 1             & -\frac{6}{23}
+        \end{array}\right]
+      \end{equation*}
+      Po podzieleniu pierwszego wiersza przez trzy, otrzymujemy rozwiązanie:
+      \begin{equation*}
+        \left[ \begin{array}{ccc|c}
+          1 & 0             & 0             & -\frac{536}{69}  \\
+          0 & 1             & 0             & \frac{160}{23}   \\
+          0 & 0             & 1             & -\frac{6}{23}
+        \end{array}\right]
+      \end{equation*}
+    \end{example}
+
+    \subsection{Rozkład LU}
+
+    Wykonanie rozkładu LU sprowadza się do zaimplementowania algorytmu eliminacji Gaussa
+    na macierzy, bez rozwiązywania układu równań. Efektem ubocznym algorytmu są mnożniki
+    eliminacyjne, które formują nam macierz \( L \) jako macierz trójkątną dolną
+    i rezultat algorytmu jako macierz trójkątną górną \( U \). Wtedy \( A = LU \),
+    dla pewnej macierzy \( A \in M_{n \times n}(\RR) \). Dokładnie ujmując, macierz
+    \( L_A \) jest postaci opisanej wzorem~\ref{eq:lower-matrix}, gdzie \( l_{ik} \)
+    to mnożniki eliminacyjne.
+    \begin{equation} \label{eq:lower-matrix}
+      [L_A]_{ij} = \begin{cases}
+        l_{ij} & \text{dla $i < j$} \\
+        1 & \text{dla $j = i$} \\
+        0 & \text{dla pozostałych wskaźników}
+      \end{cases}
+    \end{equation}
+    Natomiast macierz \( U_A \) jest macierzą, będącą rezultatem działania algorytmu
+    eliminacji Gaussa.
+
+    \begin{example}
+      Macierz \( L \) z przykładu~\ref{ex:gauss-elim} możemy zapisać jako~\ref{eq:lu-ex:L-mat}
+      oraz macierz \( U \) jako~\ref{eq:lu-ex:U-mat}.
+      \begin{align} \label{eq:lu-ex:L-mat}
+        L &= \begin{bmatrix}
+          1 & 0 & 0 \\
+          \frac{1}{3} & 1 & 0 \\
+          \frac{2}{3} & -\frac{1}{10} & 1 
+        \end{bmatrix} \\
+        U &= \begin{bmatrix} \label{eq:lu-ex:U-mat}
+          3 & 4 & 2 \\
+          0 & 6\frac{2}{3} & 6\frac{1}{3} \\
+          0 & 0 & 2\frac{3}{10}
+        \end{bmatrix}
+      \end{align}
+    \end{example}
+
+    \subsection{Wybór elementu głównego}
+    Nie zawsze element leżący na diagonali jest elementem, który można wybrać do obliczenia
+    mnożnika eliminacyjnego, ponieważ może nastąpić dzielenie przez zero. Stąd, by algorytm
+    zachowywał się poprawnie dla macierzy, które są nieosobliwe, a mają takie elementy, 
+    modyfikuje się algorytm eliminacji Gaussa przez wybór elementu głównego. Na potrzeby
+    rozwiązania będzie nas interesować wariant wyboru znany jako wybór częściowy.
+
+    Wybór częściowy odbywa się na tym, że szukamy największego elementu wśród 
+    \( k \)-tej kolumny podczas \( k \)-tego kroku eliminacyjnego. Oznaczmy ten element jako
+    \( M_k = \max \{ [A]_{1k}, [A]_{2k}, \dotsc, [A]_{nk} \} \). Jeśli \( M_k \) jest
+    dostatecznie małe, oznacza to, że liczona macierz może być prawdopodobnie macierzą
+    osobliwą. Załóżmy, że \( M_k = [A]_{\beta k} \) dla pewnego \( \beta \in \NN \).
+    Jeżeli \( M_k \) nie jest dostatecznie małe, to zamieniamy \( [A]_{\beta k} \)
+    z elementem \( [A]_{kk} \). Powyższą inwersję zapamiętujemy w tablicy, która
+    będzie interpretowana jako permutacja na \( \{ 1, 2, \dotsc, n \} \).
+
+    Odwrócenie permutacji jest proste, wymaga \( O(n) \) operacji, stąd przywrócenie
+    poprawnej kolejności wiąże się jedynie z nałożeniem odwrotnej permutacji na wektor.
+
+    Powyższą modyfikację również nanosi się na rozkład LU.
+
+    \begin{example}
+      Załóżmy, że mamy do czynienia z macierzą~\ref{eq:pivoting-ex:A-mat}. Zauważmy, że
+      macierz \( A \) na diagonali nie ma elementów niezerowych w pełni, stąd 
+      będziemy zmuszeni użyć algorytmu wyboru częściowego.
+      \begin{equation} \label{eq:pivoting-ex:A-mat}
+        A = \begin{bmatrix}
+          1   & 0   & 2 \\
+          0   & 0   & 4 \\ 
+          8   & 8   & 0 
+        \end{bmatrix}
+      \end{equation}
+
+      Elementy pod pierwszym elementem na diagonali mogą zostać wyeliminowane
+      tak jak do tej pory. Wtedy otrzymujemy macierz~\ref{eq:pivoting-ex:after-first}.
+      \begin{equation} \label{eq:pivoting-ex:after-first}
+        \begin{bmatrix}
+          1 & 0 & 2   \\
+          0 & 0 & 4   \\
+          0 & 8 & -16 \\
+        \end{bmatrix}
+      \end{equation}
+      W drugim kroku element na diagonali jest zerowy (numerycznie przyjmujemy,
+      że element jest dostatecznie bliski zeru). Wobec tego wybieramy największy
+      element w tej kolumnie. Jest to \( 8 \). Zamieniamy wiersze tak, by
+      na diagonali pojawiła się liczba \( 8 \). Reszta algorytmu odbywa się tak
+      jak w zwykłej eliminacji Gaussa.
+    \end{example}
+
 \end{document}
