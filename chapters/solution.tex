@@ -1,0 +1,176 @@
+\documentclass[../main.tex]{subfiles}
+
+\newcommand{\Zero}{\mathbf{0}}
+\newcommand{\AAA}{\mathbf{A}}
+\newcommand{\BBB}{\mathbf{B}}
+\newcommand{\CCC}{\mathbf{C}}
+
+\begin{document}
+  \chapter{Rozwiązanie problemu}
+  W tym rozdziale zostaną zaproponowane algorytmy dostosowane 
+  do zadanej macierzy \( \AAA \) wraz ze wcześniejszymi wnioskami.
+
+  \section{Zaadaptowany algorytm Gaussa}
+
+  Wobec wcześniejszych wniosków, zaadaptowany algorytm został sformułowany
+  jako algorytm~\ref{alg:elim-gauss-adapt}.
+  
+  \begin{algorithm}
+    \caption{Zaadaptowany algorytm eliminacji Gaussa}
+    \label{alg:elim-gauss-adapt}
+    \begin{algorithmic}[1]
+      \Procedure{GaussianElimination}{$A$, $b$}
+        \For{$k = 1, 2, \dotsc, n - 1$} \label{alg:elim-gauss-adapt:first-for}
+          \For{$i = k + 1, k + 2, \dotsc, k + \ell - k \bmod \ell$}
+          \label{alg:elim-gauss-adapt:second-for} 
+          \Comment{wniosek~\ref{col:num-steps}} 
+            \State $l_{ik} \gets [A]_{ik} / [A]_{kk}$ 
+            \For{$j = k + 1, k + 2, \dotsc, \min \{ n, k + \ell \} $}
+            \label{alg:elim-gauss-adapt:third-for}  
+            \Comment{wniosek~\ref{col:update-elements-kth-step}}
+              \State $[A]_{ij} \gets [A]_{ij} - l_{ik} \cdot [A]_{kj}$
+            \EndFor
+            \State $b_i \gets b_i - l_{ik} \cdot b_k$ 
+          \EndFor
+        \EndFor
+      \EndProcedure
+    \end{algorithmic}
+  \end{algorithm}
+
+  \subsection{Analiza złożoności obliczeniowej}
+
+  \begin{fact}
+    Algorytm~\ref{alg:elim-gauss-adapt} ma złożoność \( O(n \cdot \ell^2 ) \).
+  \end{fact}
+  \begin{proof}
+   Pętla w linii~\ref{alg:elim-gauss-adapt:first-for} wykonuje się dokładnie
+    \( n \) razy. Pętle w liniach~\ref{alg:elim-gauss-adapt:second-for}  
+    i~\ref{alg:elim-gauss-adapt:third-for} wykonują się co najwyżej \( \ell \)
+    razy. Stąd złożoność algorytmu to \( O(n \cdot \ell^2) \).
+  \end{proof}
+
+  \section{Zaadaptowany algorytm wyboru}
+  Algorytm został opisany jako algorytm~\ref{alg:choose-alg}.
+  Zakładamy, że algorytm wyboru będzie uruchamiany w \( k \)-tym kroku
+  eliminacyjnym, stąd kopiowanie wiersza zawsze będzie się odbywać
+  od \( k \) do co najwyżej \( k + 2 \ell \). Zakładamy, że permutacja
+  \( \sigma \) jest zainicjalizowana jako identyczność.
+  \begin{algorithm}
+    % dodać kopiowanie wiersza
+    \caption{Zaadaptowany algorytm wyboru elementu głównego}
+    \label{alg:choose-alg}
+    \begin{algorithmic}[1]
+      \Procedure{Choose}{$A$, $k$, $\sigma$, $\varepsilon$}
+%        \State $\sigma \gets \textrm{id}$
+%        \For{$k = 1, 2, \dotsc, n$}
+          \State $m \gets \argmax \{ [A]_{ik} : k + 1 \le i \le k + \ell - k \bmod \ell \}$ 
+          \Comment{wniosek~\ref{col:num-steps}}
+          \If{$|a_{mk}| < \varepsilon$}
+            \State \Return error
+          \Else
+            \State $\sigma(m) \leftrightarrow \sigma(k)$
+            \For{$i = k, k + 1, \dotsc, \min \{ n, k + 2 \ell \} $} \Comment{zamiana wierszy}
+              \State $[A]_{mi} \leftrightarrow [A]_{ki}$
+            \EndFor
+            \State $b_m \leftrightarrow b_k$ \Comment{wykonujemy, jeśli został zadany
+              wektor prawych stron}
+          \EndIf
+%        \EndFor
+%        \State \Return $\sigma$
+      \EndProcedure
+    \end{algorithmic}
+  \end{algorithm}
+
+  \subsection{Analiza złożoności obliczeniowej}
+  
+  \begin{fact}
+    Algorytm~\ref{alg:choose-alg} wykona się co najwyżej \( O(n \cdot \ell) \).
+  \end{fact}
+  \begin{proof}
+    Podobna argumentacja co przy analizie złożoności dla eliminacji Gaussa.
+  \end{proof}
+
+  \subsection{Dostosowanie algorytmu do eliminacji Gaussa}
+  By wykonać eliminację Gaussa z częściowym wyborem uruchamiamy
+  algorytm wyboru, który zwraca permutację; dla tak spermutowanej
+  macierzy uruchamiamy eliminację Gaussa, następnie wektor wynikowy
+  zostaje odwrócony za pomocą wygenerowanej odwrotnej permutacji
+  przez algorytm wyboru.
+
+  \section{Zaadaptowany rozkład LU}
+
+  Rozkład LU może zostać trywialnie otrzymany przez spamiętywanie mnożników
+  oraz wyniku algorytmu eliminacji Gaussa. 
+
+  Rozkład LU z częściowym wyborem jest przeprowadzany tak samo jak
+  eliminacja Gaussa z częściowym wyborem, z tym że spamiętujemy również
+  permutację. Przy obliczaniu układu za pomocą rozkładu LU, wektor wynikowy
+  odwracamy otrzymaną permutacją.
+
+  Wykorzystujemy również zaadaptowane algorytmy obliczania dla układów z macierzą
+  trójkątną dolną i górną.
+
+    \begin{algorithm}
+      \caption{Zaadaptowany algorytm rozwiązywania układu z macierzą trójkątną górną}
+      \label{alg:ut-matrix-adapt}
+      \begin{algorithmic}[1]
+        \Procedure{UpperTriangleSolve}{$U$, $b$}
+          \For{$i = n, n - 1, \dotsc, 1$}
+            \State $\Sigma \gets 0$
+            \For{$j = i + 1, i + 2, \dotsc, \min \{ n, i + \ell \} $}
+            \Comment{wniosek~\ref{col:update-elements-kth-step}}
+              \State $\Sigma \gets \Sigma + [U]_{ij} \cdot x_j$
+            \EndFor
+            \State $x_i \gets \frac{b_i - \Sigma}{[U]_{ii}}$
+          \EndFor
+          \State \Return $x$
+        \EndProcedure
+      \end{algorithmic}
+    \end{algorithm}
+
+    \begin{algorithm}
+      \caption{Zaadaptowany algorytm rozwiązywania układu z macierzą trójkątną dolną}
+      \label{alg:lt-matrix-adapt}
+      \begin{algorithmic}[1]
+        \Procedure{LowerTriangleSolve}{$L$, $b$}
+          \For{$i = 1, 2, \dotsc, n$}
+            \State $\Sigma \gets 0$
+            \For{$j = o(m), o(m) + 1, \dotsc, m - 1$}
+            \Comment{wniosek~\ref{col:lower-bound-L-mat}}
+              \State $\Sigma \gets \Sigma + [L]_{ij} \cdot x_j$
+            \EndFor
+            \State $x_i \gets b_i - \Sigma$
+          \EndFor
+          \State \Return $x$
+        \EndProcedure
+      \end{algorithmic}
+    \end{algorithm}
+
+  Należy zauważyć, że obliczanie \( x_i \) w algorytmie~\ref{alg:lt-matrix-adapt}
+  nie używa dzielenia przez element na przękątnej, ponieważ
+  diagonala w macierzy \( L \) składa się z samych jedynek.
+
+  \subsection{Analiza złożoności obliczeniowej}
+  Rozkład LU ma taką samą złożoność co dostosowany algorytm eliminacji Gaussa.
+
+  \section{Rozwiązywanie układu równań za pomocą zaadaptowanego rozkładu LU}
+  By rozwiązać układ równań za pomocą rozkładu LU, najpierw
+  otrzymujemy rozkład \( A = LU \) i otrzymujemy,
+  że \( LUx = b \). Stąd wyznaczamy \( Ly = b \) 
+  i następnie \( Ux = y \). Algorytmy~\ref{alg:ut-matrix-adapt}
+  oraz~\ref{alg:lt-matrix-adapt} pozwalają nam na realizację
+  tych obliczeń.
+
+  \subsection{Analiza złożoności obliczeniowej}
+
+  \begin{fact} % naprawić referencje do algorytmów
+    Algorytm~\ref{alg:ut-matrix-adapt} i~\ref{alg:lt-matrix-adapt} wykona się
+    co najwyżej w czasie \( O(n \cdot \ell) \).
+  \end{fact}
+  \begin{proof}
+    Wynika to bezpośrednio stąd, że wewnętrzną pętlę, która wykonuje się
+    co najwyżej \( \lambda \ell \) razy dla pewnego \( \lambda > 0 \), wykonujemy
+    \( n \) razy. Automatycznie dostajemy tezę.
+  \end{proof}
+
+\end{document}

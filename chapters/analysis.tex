@@ -1,0 +1,131 @@
+\documentclass[../analysis.tex]{subfiles}
+
+\newcommand{\Zero}{\mathbf{0}}
+\newcommand{\AAA}{\mathbf{A}}
+\newcommand{\BBB}{\mathbf{B}}
+\newcommand{\CCC}{\mathbf{C}}
+\begin{document}
+  \section{Analiza i wnioski}
+
+  W tej sekcji przyjrzyjmy się macierzy~\ref{eq:matrix-A-def}, 
+  która została sformułowana wcześniej.
+
+  \subsection{Obserwacje dotyczące algorytmu eliminacji Gaussa}
+
+  Macierz ta jest niewątpliwie rzadka, stąd naiwne stosowanie
+  algorytmu Gaussa i rozkładu LU przyniosłoby duży narzut
+  czasowy, stąd potrzebne są pewne uproszczenia, które spowodują,
+  że czas rozwiązania będzie co najwyżej \( O(n) \).
+
+  \begin{observation}
+    Kiedy należy wyeliminować elementy z \( k \)-tej kolumny,
+    to trzeba wyeliminować dokładnie \( \ell - k \bmod \ell \)
+    elementów pod \( k \)-tym elementem diagonali.
+  \end{observation}
+  \begin{example}
+    Niech \( \ell = 3 \) oraz \( n = 6 \). Mamy macierz 
+    postaci~\ref{eq:example-AAA}. Przekreślone elementy
+    to te, które chcemy w poszczególnych krokach wyeliminować.
+    \begin{equation} \label{eq:example-AAA}
+      \AAA = \begin{bmatrix}
+        a_{11}            & a_{12}          & a_{13}          & c_{1}           &                 &        \\
+        \cancel{a_{21}}   & a_{22}          & a_{23}          &                 & c_{2}           &        \\
+        \cancel{a_{31}}   & \cancel{a_{32}} & a_{33}          &                 &                 & c_{3}  \\
+                          &                 & \cancel{b_{1}}  & d_{11}          & d_{12}          & d_{13} \\
+                          &                 & \cancel{b_{2}}  & \cancel{d_{21}} & d_{22}          & d_{23} \\
+                          &                 & \cancel{b_{3}}  & \cancel{d_{31}} & \cancel{d_{23}} & d_{33} 
+      \end{bmatrix}
+    \end{equation}
+
+    Należy zauważyć, że liczba elementów do wyeliminowania tworzy ciąg \( 2, 1, 3, 2, 1, 3, 2, 1,
+    \dotsc \). Przez indukcję dostajemy, że ten ciąg jest zadany wzorem \( \ell - k \bmod \ell \).
+  \end{example}
+  Dostajemy oczywiście prosty wniosek wynikający z natury algorytmu Gaussa.
+  \begin{corollary} \label{col:num-steps}
+    Należy wyeliminować w \( k \)-tym kroku eliminacyjnym
+    elementy kolumny od \( k + 1 \), do \( k + \ell - k \bmod \ell \).
+  \end{corollary}
+  Również zauważamy, że
+  \begin{observation} 
+    By zmodyfikować wiersz, w którym wyeliminowaliśmy pewien element,
+    potrzebujemy zmodyfikować co najwyżej \( \ell \) elementów 
+    w wierszu.
+  \end{observation}
+  \begin{example}
+    Weźmy macierz~\ref{eq:example-AAA} jako przykład. Za skalarami
+    \( c_k \) są tylko same zera, wobec czego, od 
+    \( [\AAA]_{kk} \) do \( c_k \) jest \( \ell + 1 \) elementów 
+    w wierszu. Eliminując elementy leżące pod przekątną dla \( m > k \)
+    mamy, że \( [\AAA]_{mk} = 0 \) a dla każdego takiego kroku
+    od \( [\AAA]_{mp} \), gdzie \( p > k \), do pewnego \( c_q \),
+    gdzie \( q \in \mathbb{N} \), jest dokładnie \( \ell \) elementów
+    do zaktualizowania. Nie możemy pominąć zer pod skalarami z macierzy
+    \( \CCC_i \), ponieważ w trakcie kroku eliminacyjnego, zera mogą stać się 
+    niezerowe pod diagonalą. 
+
+    Oczywiście dbamy o zakres tablicy, stąd bierzemy zawsze minimum
+    z wymiaru i przesunięcia o \( \ell \) miejsc względem \( k \).
+  \end{example}
+  Podobnie jak w poprzedniej obserwacji otrzymujemy ważny, oraz dość prosty, wniosek:
+  \begin{corollary} \label{col:update-elements-kth-step}
+    Należy aktualizować elementy od \( k + 1 \) do \( \min \{ n, k + \ell \} \)
+    w \( k \)-tym kroku eliminacyjnym.
+  \end{corollary}
+
+  \subsection{Uproszczenie algorytmu wyboru}
+
+  Algorytm wyboru musi spełniać ważną własność --- algorytm nie może naruszać
+  struktury macierzy. Co więcej musimy ustalić, które indeksy w kolumnach
+  możemy wybierać, by otrzymać element główny. Wniosek~\ref{col:num-steps}
+  zapewnia nam, jakie elementy możemy wybierać, ponieważ wybieramy
+  zawsze elementy pod diagonalą. Jednakże będziemy musieli aktualizować
+  \( 2 \ell \) elementów w wierszu w trakcie kroku eliminacyjnego, 
+  ponieważ zaburzyliśmy strukturę macierzy \( \CCC_i \) i w najgorszym 
+  wypadku, możemy przestawić strukturę \( \CCC_i \) tak, że zamieniamy
+  pierwszy wiersz z ostatnim wierszem.
+  
+  Należy również się zastanowić, ile elementów wiersza będziemy musieli kopiować.
+  Zgodnie z poprzednią obserwacją należy kopiować \( 2 \ell + 1 \) elementów.
+
+  \subsection{Uproszczenie algorytmu rozwiązywania układu z macierzą trójkątną górną}
+  Wniosek~\ref{col:update-elements-kth-step} przenosi się bezpośrednio
+  na algorytm rozwiązywania układu równań z macierzą trójkątną górną,
+  ponieważ tylko tam algorytm w krokach eliminacyjnych mógł
+  pozostawić jakieś niezerowe wartości.
+
+  \subsection{Uproszczenie algorytmu rozwiązywania układu z macierzą trójkątną dolną}
+  \begin{observation}
+    Dla dowolnego \( k, m \in \mathbb{N} \), \( k > 0 \)
+    i \( k\ell < m \le (k + 1) \ell \) \( m \)-ty wiersz mnożników eliminacyjnych 
+    w macierzy \( L \)
+    zaczyna się od \(k \ell \)-tej kolumny i kończy się na
+    \( m \)-tej kolumnie. Jeśli \( m \le \ell \), to wiersz zaczyna się w pierwszej kolumnie
+    i kończy w \( m \)-tej kolumnie.
+  \end{observation}
+  \begin{example}
+    Po uruchomieniu algorytmu eliminacji Gaussa dla macierzy o parametrach \( \ell = 3 \)
+    oraz \( n = 6 \) otrzymujemy następującą macierz~\ref{eq:example-L-mat}.
+
+    \begin{equation} \label{eq:example-L-mat}
+      L = \begin{bmatrix}
+        l_{11}    &         &         &         &       & \\
+        l_{21}    & l_{22}  &         &         &       & \\
+        l_{31}    & l_{32}  & l_{33}  &         &       & \\
+                  &         & l_{43}  & l_{44}  &       & \\
+                  &         & l_{53}  & l_{54}  & l_{55}& \\
+                  &         & l_{63}  & l_{64}  & l_{65}& l_{66}
+      \end{bmatrix}
+    \end{equation}
+
+    Zauważamy, że indeks kolumny pierwszego elementu w \( m \)-tym wierszu
+    tworzy ciąg \( (1, 1, 1, 3, 3, 3, 6, 6, 6) \) zależny od \( m \), co potwierdza
+    naszą obserwację.
+  \end{example}
+  \begin{corollary} \label{col:lower-bound-L-mat} 
+    Indeksem kolumny pierwszego elementu \( m \)-tego wiersza macierzy \( L \) nazywamy liczbę
+    \( o(m) \) zadaną wzorem~\ref{eq:lower-bound-L-mat}.
+    \begin{equation} \label{eq:lower-bound-L-mat}
+      o(m) = \max \left\{ 1, \left( \floor*{\frac{m - (\ell + 1)}{\ell}} + 1 \right) \ell \right\}
+    \end{equation}
+  \end{corollary}
+\end{document}

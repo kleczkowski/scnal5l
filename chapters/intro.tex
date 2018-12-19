@@ -91,7 +91,7 @@
     Tym samym przekształca się wektor prawych stron za pomocą wzoru~\ref{eq:elimination-step-b}.
     \begin{equation} \label{eq:elimination-step-b}
       b^{(k + 1)}_i := \begin{cases}
-        b^{(k}_i - l_{ik} \cdot b^{(k)}_k & \text{dla $k + 1 \le i \le n$} \\
+        b^{(k)}_i - l_{ik} \cdot b^{(k)}_k & \text{dla $k + 1 \le i \le n$} \\
         b^{(k)}_i & \text{dla pozostałych wskaźników}
       \end{cases}
     \end{equation}
@@ -100,10 +100,58 @@
     \( k \)-tej kolumny. Powtarzając kroki eliminacyjne dla \( 1 \le k \le n-1 \) 
     sprawimy, że otrzymamy macierz rzadką, trójkątną górną.
     Ten proces prowadzi nas do postaci macierzy, którą potem, przy odpowiedniej
-    technice, da nam wektor \( x \) w czasie \( O(n^2) \).
+    technice, da nam wektor \( x \) w czasie \( O(n^2) \). Algorytm~\ref{alg:elim-gauss}
+    opisuje dokładnie eliminację Gaussa.
+
+    \begin{algorithm}
+      \caption{Algorytm eliminacji Gaussa}
+      \label{alg:elim-gauss}
+      \begin{algorithmic}[1]
+        \Procedure{GaussianElimination}{$A$, $b$}
+          \For{$k = 1, 2, \dotsc, n - 1$} 
+            \For{$i = k + 1, k + 2, \dotsc, n$} \Comment{$k$-ty krok eliminacyjny}
+              \State $l_{ik} \gets [A]_{ik} / [A]_{kk}$ \Comment{mnożnik eliminacyjny}
+              \For{$j = k + 1, k + 2, \dotsc, n$} \Comment{eliminacja i aktualizacja wiersza}
+                \State $[A]_{ij} \gets [A]_{ij} - l_{ik} \cdot [A]_{kj}$
+              \EndFor
+              \State $b_i \gets b_i - l_{ik} \cdot b_k$ \Comment{aktualizacja wektora prawych stron}
+            \EndFor
+          \EndFor
+        \EndProcedure
+      \end{algorithmic}
+    \end{algorithm}
 
     Koszt algorytmu eliminacji Gaussa wynosi, dla macierzy gęstych, co najwyżej \( O(n^3) \)
     operacji.
+
+    \subsection{Algorytm rozwiązywania układu z macierzą trójkątną górną}
+    
+    Po sprowadzeniu macierzy do postaci górno trójkątnej, eliminujemy
+    wszystkie elementy, które znajdują się ponad diagonalą. 
+    W zwyczajny sposób dzielimy wiersz przez jego element główny
+    i odejmujemy z wierszy wyżej odpowiednie wielokrotności
+    podzielonego uprzednio wiersza tak, by wyzerować elementy
+    nad elementem głównym.
+
+    Odpowiedni algorytm, który został podany na wykładzie,
+    jest oznaczony jako algorytm~\ref{alg:ut-matrix}.
+
+    \begin{algorithm}
+      \caption{Algorytm rozwiązywania układu z macierzą trójkątną górną}
+      \label{alg:ut-matrix}
+      \begin{algorithmic}[1]
+        \Procedure{UpperTriangleSolve}{$U$, $b$}
+          \For{$i = n, n - 1, \dotsc, 1$}
+            \State $\Sigma \gets 0$
+            \For{$j = i + 1, i + 2, \dotsc, n$}
+              \State $\Sigma \gets \Sigma + [U]_{ij} \cdot x_j$
+            \EndFor
+            \State $x_i \gets \frac{b_i - \Sigma}{[U]_{ii}}$
+          \EndFor
+          \State \Return $x$
+        \EndProcedure
+      \end{algorithmic}
+    \end{algorithm}
 
     \begin{example} \label{ex:gauss-elim}
       Załóżmy, że mamy zadaną macierz nieosobliwą~\ref{eq:example-gauss:A-mat}
@@ -177,9 +225,36 @@
       \end{equation*}
     \end{example}
 
-    \subsection{Rozkład LU}
+    \subsection{Algorytm rozwiązywania układu z macierzą trójkątną dolną}
 
-    Wykonanie rozkładu LU sprowadza się do zaimplementowania algorytmu eliminacji Gaussa
+    By móc przeprowadzić rozwiązywanie równań po rozkładzie LU, potrzebny
+    jest nam algorytm wyznaczający rozwiązanie układu równań z macierzą
+    trójkątną dolną. Algorytm jest analogiczny co~\ref{alg:ut-matrix},
+    jest podany jako~\ref{alg:lt-matrix}.
+
+    \begin{algorithm}
+      \caption{Algorytm rozwiązywania układu z macierzą trójkątną dolną}
+      \label{alg:lt-matrix}
+      \begin{algorithmic}[1]
+        \Procedure{LowerTriangleSolve}{$L$, $b$}
+          \For{$i = 1, 2, \dotsc, n$}
+            \State $\Sigma \gets 0$
+            \For{$j = 1, \dotsc, i - 1$}
+              \State $\Sigma \gets \Sigma + [L]_{ij} \cdot x_j$
+            \EndFor
+            \State $x_i \gets \frac{b_i - \Sigma}{[L]_{ii}}$
+          \EndFor
+          \State \Return $x$
+        \EndProcedure
+      \end{algorithmic}
+    \end{algorithm}
+
+    \subsection{Rozkład LU}
+    Rozkład LU to zapisanie macierzy \( A \) za pomocą macierzy trójkątnej dolnej
+    i górne, przy czym zachodzi \( A = LU \).
+
+    Zgodnie z~\cite{kielb92} wykonanie rozkładu LU sprowadza się 
+    do zaimplementowania algorytmu eliminacji Gaussa
     na macierzy, bez rozwiązywania układu równań. Efektem ubocznym algorytmu są mnożniki
     eliminacyjne, które formują nam macierz \( L \) jako macierz trójkątną dolną
     i rezultat algorytmu jako macierz trójkątną górną \( U \). Wtedy \( A = LU \),
@@ -189,7 +264,7 @@
     \begin{equation} \label{eq:lower-matrix}
       [L_A]_{ij} = \begin{cases}
         l_{ij} & \text{dla $i < j$} \\
-        1 & \text{dla $j = i$} \\
+        1 & \text{dla $i = j$} \\
         0 & \text{dla pozostałych wskaźników}
       \end{cases}
     \end{equation}
@@ -222,11 +297,11 @@
 
     Wybór częściowy odbywa się na tym, że szukamy największego elementu wśród 
     \( k \)-tej kolumny podczas \( k \)-tego kroku eliminacyjnego. Oznaczmy ten element jako
-    \( M_k = \max \{ [A]_{1k}, [A]_{2k}, \dotsc, [A]_{nk} \} \). Jeśli \( M_k \) jest
+    \( M_k = \max \{ [A]_{kk}, [A]_{(k+1)k}, \dotsc, [A]_{nk} \} \). Jeśli \( M_k \) jest
     dostatecznie małe, oznacza to, że liczona macierz może być prawdopodobnie macierzą
     osobliwą. Załóżmy, że \( M_k = [A]_{\beta k} \) dla pewnego \( \beta \in \NN \).
-    Jeżeli \( M_k \) nie jest dostatecznie małe, to zamieniamy \( [A]_{\beta k} \)
-    z elementem \( [A]_{kk} \). Powyższą inwersję zapamiętujemy w tablicy, która
+    Jeżeli \( M_k \) nie jest dostatecznie małe, to zamieniamy wiersz \( \beta \) z wierszem \(k \).
+    Powyższą inwersję zapamiętujemy w tablicy, która
     będzie interpretowana jako permutacja na \( \{ 1, 2, \dotsc, n \} \).
 
     Odwrócenie permutacji jest proste, wymaga \( O(n) \) operacji, stąd przywrócenie

@@ -2,11 +2,19 @@
 \usepackage[nosingleletter,lastparline]{impnattypo}
 \usepackage[all]{nowidow}
 
+\usepackage[margin=3cm]{geometry}
+
 \usepackage{amsmath}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
+\usepackage{cancel}
 \usepackage{biblatex}
 \addbibresource{main.bib}
 
@@ -18,12 +26,12 @@
 \usepackage{algpseudocode}
 
 \newtheorem{theorem}{Twierdzenie}[chapter]
+\newtheorem{fact}{Fakt}[chapter]
 \newtheorem{observation}{Obserwacja}[chapter]
 \newtheorem{corollary}{Wniosek}[chapter]
 \theoremstyle{definition}
 \newtheorem{definition}{Definicja}[chapter]
 \newtheorem{problem}{Problem}[chapter]
-\theoremstyle{remark}
 \newtheorem{remark}{Uwaga}[chapter]
 \newtheorem{example}{Przykład}[chapter]
 
