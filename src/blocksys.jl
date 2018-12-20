@@ -114,7 +114,7 @@ module blocksys
       for i = k + 1 : k + l - k % l
         L[i, k] = A[i, k] / A[k, k]
         A[i, k] = 0.0
-        for j = k + 1 : min(n, k + 2 * l)
+        for j = k + 1 : min(n, k + l)
           A[i, j] = A[i, j] - L[i, k] * A[k, j]
         end
         b[i] = b[i] - L[i, k] * b[k]

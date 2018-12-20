@@ -1,0 +1,45 @@
+--- dane16:
+solve_gauss:
+  0.000130 seconds (22 allocations: 7.844 KiB)
+solve_choose_gauss:
+  0.000212 seconds (80 allocations: 11.578 KiB)
+compute_lu:
+  0.000094 seconds (21 allocations: 7.641 KiB)
+  błąd względny: 1.2862088447184477e-15
+solve_lu:
+  0.000023 seconds (2 allocations: 416 bytes)
+compute_choose_lu:
+  0.000230 seconds (79 allocations: 11.375 KiB)
+  błąd względny: 8.355478822684235e-17
+solve_choose_lu:
+  0.000019 seconds (3 allocations: 624 bytes)
+--- dane10000:
+solve_gauss:
+  1.568504 seconds (48 allocations: 4.138 MiB)
+solve_choose_gauss:
+  2.583332 seconds (33.31 k allocations: 6.245 MiB)
+compute_lu:
+  1.432666 seconds (46 allocations: 4.062 MiB)
+  błąd względny: 3.993089462850312e-14
+solve_lu:
+  0.005531 seconds (4 allocations: 156.406 KiB)
+compute_choose_lu:
+  1.864132 seconds (33.31 k allocations: 6.168 MiB)
+  błąd względny: 7.76226129551865e-17
+solve_choose_lu:
+  0.008635 seconds (6 allocations: 234.609 KiB)
+--- dane50000:
+solve_gauss:
+ 76.408719 seconds (52 allocations: 16.683 MiB, 0.05% gc time)
+solve_choose_gauss:
+ 99.723845 seconds (169.85 k allocations: 27.428 MiB)
+compute_lu:
+ 80.653882 seconds (50 allocations: 16.302 MiB, 0.32% gc time)
+  błąd względny: 6.756718167727593e-15
+solve_lu:
+  0.026061 seconds (4 allocations: 781.406 KiB)
+compute_choose_lu:
+100.432888 seconds (169.84 k allocations: 27.047 MiB)
+  błąd względny: 7.645796748114702e-17
+solve_choose_lu:
+  0.037191 seconds (6 allocations: 1.145 MiB)

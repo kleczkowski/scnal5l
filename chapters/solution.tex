@@ -70,7 +70,8 @@
           \Else
             \State $\sigma(m) \leftrightarrow \sigma(k)$
             \For{$i = k, k + 1, \dotsc, \min \{ n, k + 2 \ell \} $} \Comment{zamiana wierszy}
-              \State $[A]_{mi} \leftrightarrow [A]_{ki}$
+              \State $[A]_{im} \leftrightarrow [A]_{ik}$
+              \State $\ell_{im} \leftrightarrow \ell_{ik}$
             \EndFor
             \State $b_m \leftrightarrow b_k$ \Comment{wykonujemy, jeśli został zadany
               wektor prawych stron}
@@ -173,4 +174,55 @@
     \( n \) razy. Automatycznie dostajemy tezę.
   \end{proof}
 
+  \chapter{Wyniki i interpretacja}
+
+  Powyższe algorytmy zostały zaimplementowane w języku Julia. Plik zawierający implementację,
+  to \verb|blocksys.jl|. Testy wykorzystujące wygenerowane przykłady na stronie internetowej
+  kursu zostały napisane w pliku \verb|test.jl|.
+
+  \section{Tabela wyników}
+
+  Program, wraz z rezultatami opisanymi zgodnie z formatem na liście, wygenerował
+  również informację na temat czasu działania oraz błędu względnego macierzy
+  \( A \) i jej odpowiedniego rozkładu. Wyniki zostały przedstawione w tabeli~\ref{tab:results}.
+
+  \section{Wnioski}
+
+  Rząd błędu rozwiązania waha się od \( -16 \) do \( -14 \), co potwierdza poprawność tego
+  algorytmu. Większy błąd występuje przy algorytmie eliminacji Gaussa bez częściowego wyboru,
+  ponieważ możemy dzielić elementy, które są dostatecznie bliskie zeru, powodując dalszą
+  utratę precyzji.
+
+  Należy zauważyć, że obliczenie rozkładu (de facto bezpośrednie rozwiązywanie układu równań
+  za pomocą algorytmu eliminacji) jest kosztowne, jednakże w bezpośrednich obliczeniach
+  układu za pomocą wygenerowanego rozkładu jest już wyjątkowo tanie, stąd ta metoda sprawdza się
+  gdy chcemy jednorazowo obliczyć rozkład danej macierzy i następnie wykonywać znaczącą liczbę
+  obliczeń, by otrzymać rozwiązanie dla tego układu równań.
+
+  \begin{table}
+    \label{tab:results}
+    \centering
+    \begin{tabular}{|l|l|l|l|l|l|}
+      \hline 
+      \multicolumn{5}{|c|}{$n = 16$} \\\hline 
+      & Gauss & Częściowy Gauss & LU & Częściowe LU \\ \hline
+      Błąd wzgl. & \texttt{3.764642e-15} & \texttt{5.019079e-16} &
+      \texttt{3.764642e-15} &
+      \texttt{5.019079e-16} \\ \hline
+      Czas (s) & \texttt{0.000130} & \texttt{0.000212} & \texttt{0.000023} & \texttt{0.000019} \\ \hline
+      \multicolumn{5}{|c|}{$n = 10000$} \\\hline 
+      & Gauss & Częściowy Gauss & LU & Częściowe LU \\ \hline
+      Błąd wzgl. & \texttt{6.601103e-14} & \texttt{3.8352702e-16} &
+      \texttt{6.601103e-14} &
+      \texttt{3.8352702e-16} \\ \hline
+      Czas (s) & \texttt{1.568504} & \texttt{2.583332} & \texttt{0.005531} & \texttt{0.008635} \\ \hline
+      \multicolumn{5}{|c|}{$n = 50000$} \\\hline 
+      & Gauss & Częściowy Gauss & LU & Częściowe LU \\ \hline
+      Błąd wzgl. & \texttt{2.985915e-14} & \texttt{4.1456863e-16} &
+      \texttt{2.9859158e-14} &
+      \texttt{4.145686e-16} \\ \hline
+      Czas (s) & \texttt{76.408719} & \texttt{99.723845} & \texttt{0.026061} & \texttt{0.037191} \\ \hline
+    \end{tabular}
+    \caption{Tabela błędów i czasu obliczania rozwiązania dla układu równań \( Ax = b \)}
+  \end{table}
 \end{document}
