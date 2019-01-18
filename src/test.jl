@@ -8,8 +8,8 @@ using SparseArrays
 ### Uruchamia test dla:
 ###   * eliminacji Gaussa bez i z częściowym wyborem (eps = 0.1)
 ###   * rozwiązywania układu równań na podstawie rozkładu LU
-function run_basic_solve_test(mat_file :: String, 
-                              b_file :: String, 
+function run_basic_solve_test(mat_file :: String,
+                              b_file :: String,
                               out_file :: String)
   println("--- $(out_file):")
   A, n, l = blocksys.load_matrix(mat_file)
@@ -18,7 +18,7 @@ function run_basic_solve_test(mat_file :: String,
   @time xg = blocksys.solve_gauss(A, b, n, l)
   println("solve_choose_gauss:")
   @time xcg = blocksys.solve_choose_gauss(A, b, n, l, 0.1)
-  
+
   blocksys.write_x(xg, "$(out_file)_gauss.txt", true)
   blocksys.write_x(xcg, "$(out_file)_choose_gauss.txt", true)
 
@@ -31,10 +31,10 @@ function run_basic_solve_test(mat_file :: String,
   println("compute_choose_lu:")
   @time Lc, Uc, sigma = blocksys.compute_choose_lu(A, n, l, 0.1)
   id = zeros(Int64, n)
-  for i = 1 : n 
+  for i = 1 : n
     id[i] = i
   end
-  Ap = permute(A, sigma, id) 
+  Ap = permute(A, sigma, id)
   println("  błąd względny: $(norm(Ap - Lc * Uc) / norm(Ap))")
   println("solve_choose_lu:")
   @time xclu = blocksys.solve_choose_lu(Lc, Uc, sigma, b, n, l)
@@ -42,13 +42,12 @@ function run_basic_solve_test(mat_file :: String,
   blocksys.write_x(xcg, "$(out_file)_choose_lu.txt", true)
 end
 
-run_basic_solve_test("../resources/Dane16_1_1/A.txt",
-                     "../resources/Dane16_1_1/b.txt",
-                     "dane16")
-run_basic_solve_test("../resources/Dane10000_1_1/A.txt",
-                     "../resources/Dane10000_1_1/b.txt",
-                     "dane10000")
-run_basic_solve_test("../resources/Dane50000_1_1/A.txt",
-                     "../resources/Dane50000_1_1/b.txt",
-                     "dane50000")
-
+#run_basic_solve_test("../resources/Dane16_1_1/A.txt",
+#                     "../resources/Dane16_1_1/b.txt",
+#                     "dane16")
+#run_basic_solve_test("../resources/Dane10000_1_1/A.txt",
+#                     "../resources/Dane10000_1_1/b.txt",
+#                     "dane10000")
+#run_basic_solve_test("../resources/Dane50000_1_1/A.txt",
+#                     "../resources/Dane50000_1_1/b.txt",
+#                     "dane50000")
